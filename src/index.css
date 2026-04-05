@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-emerald-50: #062615;
+  --color-emerald-100: #044026;
+  --color-amber-50: #291c06;
+  --color-amber-100: #4a3206;
+  --color-rose-50: #2b0b13;
+  --color-rose-100: #4a1322;
+
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #0B0F1A;
+  color: #F0EDE6;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animate-fade-in-up-delay-1 { animation-delay: 0.1s; opacity: 0; }
+.animate-fade-in-up-delay-2 { animation-delay: 0.2s; opacity: 0; }
+.animate-fade-in-up-delay-3 { animation-delay: 0.3s; opacity: 0; }
+.animate-fade-in-up-delay-4 { animation-delay: 0.4s; opacity: 0; }
+.animate-fade-in-up-delay-5 { animation-delay: 0.5s; opacity: 0; }
+
+.glass-card {
+  background: rgba(11, 15, 26, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(30, 45, 69, 0.5);
+}
+
+.gradient-mesh {
+  background:
+    radial-gradient(at 20% 20%, rgba(212, 168, 71, 0.05) 0px, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(212, 168, 71, 0.03) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(30, 45, 69, 0.4) 0px, transparent 50%);
+}
