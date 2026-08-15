@@ -89,8 +89,9 @@ export function Dashboard({ data, onReset, onFileSelect, returnData, onUploadRet
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back</span>
           </button>
-          <h1 className="text-lg font-bold text-slate-800 hidden sm:block">
-            Flipkart Seller <span className="text-primary-600">Report Analyzer</span>
+          <h1 className="text-lg font-bold text-slate-800 hidden sm:flex items-center gap-2">
+            <img src="/assets/logo-mark.png" alt="" className="w-7 h-7 object-contain" />
+            Seller<span className="text-primary-600 -ml-2">Metric</span>
           </h1>
           <div className="flex items-center gap-3">
             {infoStr && (
@@ -546,7 +547,7 @@ export function Dashboard({ data, onReset, onFileSelect, returnData, onUploadRet
 
         {/* Footer */}
         <div className="text-center py-8 border-t border-slate-200 space-y-2">
-          <p className="text-xs text-slate-400">Flipkart Seller Report Analyzer • Sales & Return Performance Dashboard • Generated from uploaded data (CSV, XLSX, XLS, TSV)</p>
+          <p className="text-xs text-slate-400">SellerMetric • Sales & Return Performance Dashboard • Generated privately from uploaded data (CSV, XLSX, XLS, TSV)</p>
           <p className="text-sm text-slate-400">
             Created by{' '}
             <a
