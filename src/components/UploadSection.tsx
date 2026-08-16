@@ -26,6 +26,7 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
     const toast = shadow.getElementById('toast');
     const menuToggle = shadow.getElementById('menuToggle');
     const mobileNav = shadow.getElementById('mobileNav');
+    const navigation = shadow.querySelector<HTMLElement>('.nav');
     let selectedFile: File | null = null;
 
     if (input) input.accept = '.csv,.xlsx,.xls,.tsv';
@@ -176,10 +177,16 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
         closeMenu();
       }
     };
+    const updateNavigationStyle = () => {
+      if (!navigation) return;
+      navigation.classList.toggle('nav-scrolled', window.scrollY > 6);
+    };
     const handleResize = () => {
       if (window.innerWidth > 960) closeMenu();
+      updateNavigationStyle();
     };
 
+    updateNavigationStyle();
     shadow.addEventListener('click', handleClick);
     input?.addEventListener('change', handleChange);
     dropzone?.addEventListener('dragenter', handleDragOver);
@@ -188,6 +195,7 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
     dropzone?.addEventListener('drop', handleDrop);
     document.addEventListener('keydown', handleKeydown);
     document.addEventListener('click', handleOutsideClick);
+    window.addEventListener('scroll', updateNavigationStyle, { passive: true });
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -200,6 +208,7 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
       dropzone?.removeEventListener('drop', handleDrop);
       document.removeEventListener('keydown', handleKeydown);
       document.removeEventListener('click', handleOutsideClick);
+      window.removeEventListener('scroll', updateNavigationStyle);
       window.removeEventListener('resize', handleResize);
     };
   }, [onFileSelect]);
