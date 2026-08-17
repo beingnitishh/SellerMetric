@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { UploadSection } from './components/UploadSection';
+import { FeaturesPage } from './components/FeaturesPage';
+import { FaqPage, HowItWorksPage, PrivacyPage } from './components/InfoPages';
 import { LoadingScreen } from './components/LoadingScreen';
 import { Dashboard } from './components/Dashboard';
 import { processData } from './processData';
@@ -139,6 +141,12 @@ export function App() {
       />
     );
   }
+
+  const normalizedPath = window.location.pathname.replace(/\/$/, '') || '/';
+  if (normalizedPath === '/features') return <FeaturesPage onFileSelect={handleFileUpload} />;
+  if (normalizedPath === '/how-it-works') return <HowItWorksPage onFileSelect={handleFileUpload} />;
+  if (normalizedPath === '/privacy') return <PrivacyPage onFileSelect={handleFileUpload} />;
+  if (normalizedPath === '/faq') return <FaqPage onFileSelect={handleFileUpload} />;
 
   return (
     <UploadSection
