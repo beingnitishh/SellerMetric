@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import landingHtml from '../landing.html?raw';
 import landingCss from '../landing.css?raw';
-import { isFileSupported } from '../fileParser';
+import { isFileSupported } from '../fileSupport';
 
 interface UploadSectionProps {
   onFileSelect: (file: File) => void;
@@ -182,7 +182,7 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
       navigation.classList.toggle('nav-scrolled', window.scrollY > 6);
     };
     const handleResize = () => {
-      if (window.innerWidth > 960) closeMenu();
+      if (window.innerWidth > 1100) closeMenu();
       updateNavigationStyle();
     };
 

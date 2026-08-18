@@ -1,16 +1,21 @@
-import { useState, useCallback } from 'react';
-import { UploadSection } from './components/UploadSection';
-import { FeaturesPage } from './components/FeaturesPage';
-import { FaqPage, HowItWorksPage, PrivacyPage } from './components/InfoPages';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { LoadingScreen } from './components/LoadingScreen';
-import { Dashboard } from './components/Dashboard';
-import { processData } from './processData';
-import { parseFile, detectFileType } from './fileParser';
-import { normalizeReturnData } from './returnProcessor';
 import type { ProcessedData, ReturnRecord } from './types';
 
+const Dashboard = lazy(() => import('./components/Dashboard').then(module => ({ default: module.Dashboard })));
+const UploadSection = lazy(() => import('./components/UploadSection').then(module => ({ default: module.UploadSection })));
+const FeaturesPage = lazy(() => import('./components/FeaturesPage').then(module => ({ default: module.FeaturesPage })));
+const HowItWorksPage = lazy(() => import('./components/InfoPages').then(module => ({ default: module.HowItWorksPage })));
+const PrivacyPage = lazy(() => import('./components/InfoPages').then(module => ({ default: module.PrivacyPage })));
+const FaqPage = lazy(() => import('./components/InfoPages').then(module => ({ default: module.FaqPage })));
+const BlogIndexPage = lazy(() => import('./components/BlogPages').then(module => ({ default: module.BlogIndexPage })));
+const BlogArticlePage = lazy(() => import('./components/BlogPages').then(module => ({ default: module.BlogArticlePage })));
 type AppState = 'upload' | 'loading' | 'dashboard';
 type TabType = 'sales' | 'returns';
+
+function toReturnRecords(rows: Record<string, string>[]) {
+  return rows.map(row => Object.fromEntries(Object.keys(row).map(key => [key, row[key] || ''])));
+}
 
 export function App() {
   const [state, setState] = useState<AppState>('upload');
@@ -18,139 +23,83 @@ export function App() {
   const [returnData, setReturnData] = useState<ReturnRecord[]>([]);
   const [initialTab, setInitialTab] = useState<TabType>('sales');
 
-  /**
-   * Unified file upload handler — auto-detects Sales vs Return data
-   * Used by: landing page hero CTA, landing page drag-drop, bottom CTA
-   */
-  const handleFileUpload = useCallback((file: File) => {
+  useEffect(() => {
+    const robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    if (!robots) return;
+    robots.content = state === 'upload'
+      ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+      : 'noindex, nofollow';
+  }, [state]);
+
+  const handleFileUpload = useCallback(async (file: File) => {
     setState('loading');
-
-    parseFile(file)
-      .then((rows) => {
-        const detectedType = detectFileType(rows);
-
-        if (detectedType === 'returns') {
-          // Process as return data
-          const rawRecords: Record<string, string>[] = rows.map(row => {
-            const record: Record<string, string> = {};
-            for (const key of Object.keys(row)) {
-              record[key] = row[key] || '';
-            }
-            return record;
-          });
-          const normalized = normalizeReturnData(rawRecords);
-          if (normalized.length === 0) {
-            alert('No valid return records found. Please ensure your file contains return data with columns like SKU, Product, Total Price, Return Type, Return Reason, etc.');
-            setState(data || returnData.length > 0 ? 'dashboard' : 'upload');
-            return;
-          }
-          setReturnData(normalized);
-          setInitialTab('returns');
-          setState('dashboard');
-        } else {
-          // Process as sales data
-          const processed = processData(rows);
-          setData(processed);
-          setInitialTab('sales');
-          setState('dashboard');
-        }
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      })
-      .catch((error) => {
-        alert(error instanceof Error ? error.message : 'Error processing data: Please ensure headers exactly match the standard export format.');
-        console.error(error);
-        setState(data || returnData.length > 0 ? 'dashboard' : 'upload');
-      });
+    try {
+      const [{ parseFile, detectFileType }, { processData }, { normalizeReturnData }] = await Promise.all([
+        import('./fileParser'), import('./processData'), import('./returnProcessor'),
+      ]);
+      const rows = await parseFile(file);
+      if (detectFileType(rows) === 'returns') {
+        const normalized = normalizeReturnData(toReturnRecords(rows));
+        if (!normalized.length) throw new Error('No valid return records found. Check that the file includes SKU, Product, Total Price, Return Type and Return Reason columns.');
+        setReturnData(normalized);
+        setInitialTab('returns');
+      } else {
+        setData(processData(rows));
+        setInitialTab('sales');
+      }
+      setState('dashboard');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Unable to process this report. Check the file format and standard Flipkart headers.');
+      console.error(error);
+      setState(data || returnData.length ? 'dashboard' : 'upload');
+    }
   }, [data, returnData]);
 
-  /**
-   * Dashboard-level sales file upload (from Upload Modal inside dashboard)
-   * This always processes as sales data since the user explicitly clicks "Upload Sales Report"
-   */
-  const handleSalesFileSelect = useCallback((file: File) => {
+  const handleSalesFileSelect = useCallback(async (file: File) => {
     setState('loading');
-
-    parseFile(file)
-      .then((rows) => {
-        const processed = processData(rows);
-        setData(processed);
-        setInitialTab('sales');
-        setState('dashboard');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      })
-      .catch((error) => {
-        alert(error instanceof Error ? error.message : 'Error processing data.');
-        console.error(error);
-        setState('dashboard');
-      });
+    try {
+      const [{ parseFile }, { processData }] = await Promise.all([import('./fileParser'), import('./processData')]);
+      setData(processData(await parseFile(file)));
+      setInitialTab('sales');
+      setState('dashboard');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Unable to process this sales report.');
+      console.error(error);
+      setState('dashboard');
+    }
   }, []);
 
-  /**
-   * Dashboard-level return file upload (from ReturnDashboard upload area)
-   */
-  const handleReturnUpload = useCallback((file: File) => {
-    parseFile(file)
-      .then((rows) => {
-        const rawRecords: Record<string, string>[] = rows.map(row => {
-          const record: Record<string, string> = {};
-          for (const key of Object.keys(row)) {
-            record[key] = row[key] || '';
-          }
-          return record;
-        });
-        const normalized = normalizeReturnData(rawRecords);
-        if (normalized.length === 0) {
-          alert('No valid return records found. Please ensure your file contains return data with columns like SKU, Product, Total Price, Return Type, Return Reason, etc.');
-          return;
-        }
-        setReturnData(normalized);
-      })
-      .catch((error) => {
-        alert(error instanceof Error ? error.message : 'Error processing return data.');
-        console.error(error);
-      });
-  }, []);
-
-  const handleClearReturn = useCallback(() => {
-    setReturnData([]);
+  const handleReturnUpload = useCallback(async (file: File) => {
+    try {
+      const [{ parseFile }, { normalizeReturnData }] = await Promise.all([import('./fileParser'), import('./returnProcessor')]);
+      const normalized = normalizeReturnData(toReturnRecords(await parseFile(file)));
+      if (!normalized.length) throw new Error('No valid return records were found in this file.');
+      setReturnData(normalized);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Unable to process this return report.');
+      console.error(error);
+    }
   }, []);
 
   const handleReset = useCallback(() => {
-    setData(null);
-    setReturnData([]);
-    setState('upload');
+    setData(null); setReturnData([]); setState('upload');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  if (state === 'loading') {
-    return <LoadingScreen />;
+  if (state === 'loading') return <LoadingScreen />;
+  if (state === 'dashboard' && (data || returnData.length)) {
+    return <Suspense fallback={<LoadingScreen />}><Dashboard data={data} onReset={handleReset} onFileSelect={handleSalesFileSelect} returnData={returnData} onUploadReturn={handleReturnUpload} onClearReturn={() => setReturnData([])} initialTab={initialTab} /></Suspense>;
   }
 
-  // Show dashboard if we have sales data OR return data
-  if (state === 'dashboard' && (data || returnData.length > 0)) {
-    return (
-      <Dashboard
-        data={data}
-        onReset={handleReset}
-        onFileSelect={handleSalesFileSelect}
-        returnData={returnData}
-        onUploadReturn={handleReturnUpload}
-        onClearReturn={handleClearReturn}
-        initialTab={initialTab}
-      />
-    );
-  }
-
-  const normalizedPath = window.location.pathname.replace(/\/$/, '') || '/';
-  if (normalizedPath === '/features') return <FeaturesPage onFileSelect={handleFileUpload} />;
-  if (normalizedPath === '/how-it-works') return <HowItWorksPage onFileSelect={handleFileUpload} />;
-  if (normalizedPath === '/privacy') return <PrivacyPage onFileSelect={handleFileUpload} />;
-  if (normalizedPath === '/faq') return <FaqPage onFileSelect={handleFileUpload} />;
-
-  return (
-    <UploadSection
-      onFileSelect={handleFileUpload}
-    />
-  );
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
+  const publicPage = path === '/features' ? <FeaturesPage onFileSelect={handleFileUpload} />
+    : path === '/how-it-works' ? <HowItWorksPage onFileSelect={handleFileUpload} />
+    : path === '/privacy' ? <PrivacyPage onFileSelect={handleFileUpload} />
+    : path === '/faq' ? <FaqPage onFileSelect={handleFileUpload} />
+    : path === '/blog' ? <BlogIndexPage />
+    : path.startsWith('/blog/') ? <BlogArticlePage slug={path.slice('/blog/'.length)} />
+    : <UploadSection onFileSelect={handleFileUpload} />;
+  return <Suspense fallback={<LoadingScreen />}>{publicPage}</Suspense>;
 }

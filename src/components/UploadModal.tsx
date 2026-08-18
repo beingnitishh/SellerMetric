@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { Upload, FileSpreadsheet, X, CheckCircle2, AlertCircle, FileText, Sheet, Table2 } from 'lucide-react';
-import { isFileSupported, getAcceptString, getFileFormatLabel } from '../fileParser';
+import { isFileSupported, getAcceptString, getFileFormatLabel } from '../fileSupport';
 
 interface UploadModalProps {
   isOpen: boolean;

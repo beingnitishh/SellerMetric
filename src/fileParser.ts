@@ -2,35 +2,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import type { RawRow } from './types';
 
-export type SupportedExtension = '.csv' | '.xlsx' | '.xls' | '.tsv';
-
-const SUPPORTED_EXTENSIONS: SupportedExtension[] = ['.csv', '.xlsx', '.xls', '.tsv'];
-
-const ACCEPT_STRING = '.csv,.xlsx,.xls,.tsv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/tab-separated-values';
-
-export function getAcceptString(): string {
-  return ACCEPT_STRING;
-}
-
-export function getSupportedExtensions(): SupportedExtension[] {
-  return [...SUPPORTED_EXTENSIONS];
-}
-
-function getFileExtension(filename: string): string {
-  const idx = filename.lastIndexOf('.');
-  if (idx === -1) return '';
-  return filename.substring(idx).toLowerCase();
-}
-
-export function isFileSupported(file: File): boolean {
-  const ext = getFileExtension(file.name);
-  return (SUPPORTED_EXTENSIONS as string[]).includes(ext);
-}
-
-export function getFileFormatLabel(filename: string): string {
-  const ext = getFileExtension(filename).toUpperCase().replace('.', '');
-  return ext || 'Unknown';
-}
+import { getFileExtension, isFileSupported } from './fileSupport';
 
 function parseCSVOrTSV(file: File): Promise<RawRow[]> {
   return new Promise((resolve, reject) => {

@@ -4,7 +4,7 @@ import {
   FileSpreadsheet, Layers3, LockKeyhole, Menu, PackageSearch,
   RotateCcw, ShieldCheck, Sparkles, Target, TrendingUp, Upload, X,
 } from 'lucide-react';
-import { getAcceptString, isFileSupported } from '../fileParser';
+import { getAcceptString, isFileSupported } from '../fileSupport';
 import '../features-page.css';
 
 interface FeaturesPageProps {
@@ -22,7 +22,7 @@ const featureNav = [
 
 export function FeaturesPage({ onFileSelect }: FeaturesPageProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => { document.title = 'SellerMetric Features — Sales & Return Analytics'; const frame = requestAnimationFrame(() => { if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView(); }); return () => { cancelAnimationFrame(frame); document.title = 'SellerMetric — Free Flipkart Seller Report Analyzer'; }; }, []);
+  useEffect(() => { document.title = 'Flipkart Seller Analytics Features | SellerMetric'; const frame = requestAnimationFrame(() => { if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView(); }); return () => { cancelAnimationFrame(frame); document.title = 'SellerMetric — Free Flipkart Seller Report Analyzer'; }; }, []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const chooseReport = () => inputRef.current?.click();
@@ -46,6 +46,7 @@ export function FeaturesPage({ onFileSelect }: FeaturesPageProps) {
           <a href="/">Home</a>
           <a className="active" href="/features">Features</a>
           <a href="/how-it-works">How It Works</a>
+          <a href="/blog">Seller Guides</a>
           <a href="/privacy">Privacy</a>
           <a href="/faq">FAQ</a>
         </nav>
@@ -58,6 +59,7 @@ export function FeaturesPage({ onFileSelect }: FeaturesPageProps) {
             <a href="/">Home <ChevronRight /></a>
             <a href="/features">Features <ChevronRight /></a>
             <a href="/how-it-works">How It Works <ChevronRight /></a>
+            <a href="/blog">Seller Guides <ChevronRight /></a>
             <a href="/privacy">Privacy <ChevronRight /></a>
             <a href="/faq">FAQ <ChevronRight /></a>
             <button onClick={chooseReport}>Analyze My Reports <ArrowRight /></button>
@@ -181,7 +183,7 @@ export function FeaturesPage({ onFileSelect }: FeaturesPageProps) {
         </section>
       </main>
 
-      <footer className="fp-footer"><div className="fp-shell"><a className="fp-brand" href="/"><img src="/assets/logo-mark.png" alt="" /><span>Seller<b>Metric</b></span></a><span>© 2026 SellerMetric. Built for independent sellers.</span><div><a href="/">Home</a><a href="/privacy">Privacy</a><a href="/faq">FAQ</a><a href="https://www.instagram.com/oyee.nitishh/" target="_blank" rel="noreferrer">@oyee.nitishh ↗</a></div></div></footer>
+      <footer className="fp-footer"><div className="fp-shell"><a className="fp-brand" href="/"><img src="/assets/logo-mark.png" alt="" /><span>Seller<b>Metric</b></span></a><span>© 2026 SellerMetric. Built for independent sellers.</span><div><a href="/">Home</a><a href="/blog">Seller Guides</a><a href="/privacy">Privacy</a><a href="/faq">FAQ</a><a href="https://www.instagram.com/oyee.nitishh/" target="_blank" rel="noreferrer">@oyee.nitishh ↗</a></div></div></footer>
     </div>
   );
 }

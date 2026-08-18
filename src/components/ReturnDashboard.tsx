@@ -10,7 +10,7 @@ import { computeReturnMetrics } from '../returnProcessor';
 import { KPICard } from './KPICard';
 import { SectionHeader } from './SectionHeader';
 import { ReturnCharts } from './ReturnCharts';
-import { isFileSupported, getAcceptString } from '../fileParser';
+import { isFileSupported, getAcceptString } from '../fileSupport';
 
 interface ReturnDashboardProps {
   returnData: ReturnRecord[];
@@ -372,7 +372,7 @@ export function ReturnDashboard({ returnData, onUploadReturn, onClearReturn }: R
           <div className="bg-gradient-to-br from-primary-50 to-indigo-50 p-6 rounded-2xl border border-primary-100">
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-primary-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                AI Insights
+                Automated Insights
               </span>
               <Sparkles className="w-4 h-4 text-primary-500" />
             </div>

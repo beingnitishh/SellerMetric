@@ -6,7 +6,7 @@ import {
   MousePointer2, Search, ShieldCheck, Sparkles, TableProperties, Upload,
   WifiOff, X, Zap,
 } from 'lucide-react';
-import { getAcceptString, isFileSupported } from '../fileParser';
+import { getAcceptString, isFileSupported } from '../fileSupport';
 import '../features-page.css';
 import '../info-pages.css';
 
@@ -15,7 +15,7 @@ interface InfoPageProps { onFileSelect: (file: File) => void }
 
 const mainNav = [
   ['/', 'Home', 'home'], ['/features', 'Features', 'features'],
-  ['/how-it-works', 'How It Works', 'how'], ['/privacy', 'Privacy', 'privacy'], ['/faq', 'FAQ', 'faq'],
+  ['/how-it-works', 'How It Works', 'how'], ['/blog', 'Seller Guides', 'blog'], ['/privacy', 'Privacy', 'privacy'], ['/faq', 'FAQ', 'faq'],
 ];
 
 function SiteHeader({ active, chooseReport }: { active: string; chooseReport: () => void }) {
@@ -29,11 +29,11 @@ function SiteHeader({ active, chooseReport }: { active: string; chooseReport: ()
   </header>;
 }
 
-function SiteFooter(){return <footer className="fp-footer ip-footer"><div className="fp-shell"><a className="fp-brand" href="/"><img src="/assets/logo-mark.png" alt=""/><span>Seller<b>Metric</b></span></a><span>© 2026 SellerMetric. Built for independent sellers.</span><div><a href="/features">Features</a><a href="/how-it-works">How It Works</a><a href="/privacy">Privacy</a><a href="/faq">FAQ</a><a href="https://www.instagram.com/oyee.nitishh/" target="_blank" rel="noreferrer">@oyee.nitishh ↗</a></div></div></footer>}
+function SiteFooter(){return <footer className="fp-footer ip-footer"><div className="fp-shell"><a className="fp-brand" href="/"><img src="/assets/logo-mark.png" alt=""/><span>Seller<b>Metric</b></span></a><span>© 2026 SellerMetric. Built for independent sellers.</span><div><a href="/features">Features</a><a href="/how-it-works">How It Works</a><a href="/blog">Seller Guides</a><a href="/privacy">Privacy</a><a href="/faq">FAQ</a><a href="https://www.instagram.com/oyee.nitishh/" target="_blank" rel="noreferrer">@oyee.nitishh ↗</a></div></div></footer>}
 
 function PageFrame({active, onFileSelect, children}:{active:PageName;onFileSelect:(file:File)=>void;children:React.ReactNode}){
   const input=useRef<HTMLInputElement>(null);
-  useEffect(()=>{const titles={how:'How SellerMetric Works — Complete Guide',privacy:'SellerMetric Privacy — Local Browser Processing',faq:'SellerMetric FAQ — Reports, Analytics & Privacy'};document.title=titles[active];const frame=requestAnimationFrame(()=>{if(location.hash)document.getElementById(location.hash.slice(1))?.scrollIntoView()});return()=>{cancelAnimationFrame(frame);document.title='SellerMetric — Free Flipkart Seller Report Analyzer'}},[active]);
+  useEffect(()=>{const titles={how:'How SellerMetric Works | Flipkart Seller Report Analyzer',privacy:'Privacy Policy | SellerMetric',faq:'SellerMetric FAQ | Flipkart Seller Report Analyzer'};document.title=titles[active];const frame=requestAnimationFrame(()=>{if(location.hash)document.getElementById(location.hash.slice(1))?.scrollIntoView()});return()=>{cancelAnimationFrame(frame);document.title='SellerMetric — Free Flipkart Seller Report Analyzer'}},[active]);
   const choose=()=>input.current?.click();
   const change=(file?:File)=>{if(!file)return;if(!isFileSupported(file)){alert('Choose a CSV, XLSX, XLS, or TSV report.');return}onFileSelect(file)};
   return <div className="fp-page ip-page"><SiteHeader active={active} chooseReport={choose}/><input ref={input} hidden type="file" accept={getAcceptString()} onChange={e=>{change(e.target.files?.[0]);e.target.value=''}}/>{children}<SiteFooter/></div>
